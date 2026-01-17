@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Medium Digest AI</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    <header>
+      <div class="logo">
+        <span class="logo-icon">✨</span>
+        <h1>Digest AI</h1>
+      </div>
+      <button id="settings-btn" class="icon-btn" aria-label="Settings">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+      </button>
+    </header>
+
+    <div id="settings-panel" class="panel hidden">
+      <div class="panel-header">
+        <h2>Configuration</h2>
+        <button id="close-settings" class="close-btn">&times;</button>
+      </div>
+      <div class="input-group">
+        <label for="api-key">OpenAI API Key (or Compatible)</label>
+        <input type="password" id="api-key" placeholder="sk-...">
+        <p class="hint">Your key is stored locally.</p>
+      </div>
+      <div class="input-group">
+        <label for="api-model">Model</label>
+        <select id="api-model">
+          <option value="gpt-4o-mini" selected>GPT-4o Mini</option>
+          <option value="gpt-4o">GPT-4o</option>
+          <option value="gemini-1.5-flash">Gemini 1.5 Flash (via OpenAI Compat)</option>
+        </select>
+      </div>
+      <button id="save-settings" class="btn primary small">Save Settings</button>
+    </div>
+
+    <main>
+      <div class="status-card">
+        <p id="status-text">Open a Medium Digest email to start.</p>
+        <div class="progress-bar hidden">
+          <div class="progress-fill" style="width: 0%"></div>
+        </div>
+      </div>
+
+      <button id="analyze-btn" class="btn primary large glow">
+        <span class="btn-icon">🚀</span>
+        Summarize Digest
+      </button>
+
+      <div id="results-list" class="results-list">
+        <!-- Summaries will be injected here -->
+      </div>
+    </main>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

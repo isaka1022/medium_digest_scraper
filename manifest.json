@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "Medium Digest Summarizer",
+  "version": "1.0",
+  "description": "Extracts links from Medium Daily Digest emails, fetches article content, and generates summaries using AI.",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "scripting",
+    "offscreen"
+  ],
+  "host_permissions": [
+    "https://*.medium.com/*",
+    "https://medium.com/*"
+  ],
+  "action": {
+    "default_popup": "src/popup.html"
+  },
+  "background": {
+    "service_worker": "src/background.js"
+  }
+}
