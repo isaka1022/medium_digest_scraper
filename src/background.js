@@ -1,5 +1,26 @@
 let creatingOffscreenParams = null; // Promise to prevent race conditions
 
+// Deprecated model IDs from previous versions mapped to their current replacements.
+// Applied when reading saved settings so users with old storage values get the new model.
+const MODEL_MIGRATIONS = {
+  'gpt-4o': 'gpt-4.1',
+  'gpt-4o-mini': 'gpt-4.1-mini',
+  'gemini-1.5-flash': 'gemini-2.0-flash',
+};
+
+/**
+ * Send a fire-and-forget message to the extension runtime.
+ * The popup may be closed by the time background sends progress updates,
+ * which causes "Could not establish connection" errors. Checking
+ * chrome.runtime.lastError inside the callback silences those safely.
+ */
+function sendRuntimeMessage(msg) {
+  chrome.runtime.sendMessage(msg, () => {
+    // Suppress "Could not establish connection" when the popup is closed.
+    void chrome.runtime.lastError;
+  });
+}
+
 async function setupOffscreenDocument(path) {
   // Check for existing offscreen document
   const existingContexts = await chrome.runtime.getContexts({
@@ -56,7 +77,7 @@ async function summarizeWithLLM(apiKey, model, text) {
         'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: model || 'gpt-4o-mini',
+        model: MODEL_MIGRATIONS[model] || model || 'gpt-4.1-mini',
         messages: [
           { role: "system", content: "You are a helpful assistant. Summarize the following article in Japanese in 3 concise bullet points." },
           { role: "user", content: text }
@@ -98,8 +119,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         
         console.log(`Found ${articles.length} articles`);
         
-        // Notify Popup of count
-        chrome.runtime.sendMessage({ type: 'STATUS_UPDATE', status: `Found ${articles.length} articles. Processing...`, total: articles.length });
+        // Notify popup of count (popup may be closed; sendRuntimeMessage suppresses the resulting error).
+        sendRuntimeMessage({ type: 'STATUS_UPDATE', status: `Found ${articles.length} articles. Processing...`, total: articles.length });
 
         const { apiKey, model } = await chrome.storage.local.get(['apiKey', 'model']);
 
@@ -109,7 +130,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         for (const article of articles) {
           try {
             // Update status for specific article
-             chrome.runtime.sendMessage({ type: 'ARTICLE_START', articleId: article.url });
+             sendRuntimeMessage({ type: 'ARTICLE_START', articleId: article.url });
 
              // Fetch
              const res = await fetch(article.url, { credentials: 'include' });
@@ -130,22 +151,22 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
              summaries.push(result);
              
              // Send incremental result
-             chrome.runtime.sendMessage({ type: 'ARTICLE_COMPLETE', data: result });
+             sendRuntimeMessage({ type: 'ARTICLE_COMPLETE', data: result });
              
           } catch (e) {
             console.error(e);
-            chrome.runtime.sendMessage({ type: 'ARTICLE_ERROR', url: article.url, error: e.toString() });
+            sendRuntimeMessage({ type: 'ARTICLE_ERROR', url: article.url, error: e.toString() });
           }
-          
+
           completed++;
-          chrome.runtime.sendMessage({ type: 'PROGRESS_UPDATE', completed: completed, total: articles.length });
+          sendRuntimeMessage({ type: 'PROGRESS_UPDATE', completed: completed, total: articles.length });
         }
-        
-        chrome.runtime.sendMessage({ type: 'ANALYSIS_COMPLETE', summaries: summaries });
-        
+
+        sendRuntimeMessage({ type: 'ANALYSIS_COMPLETE', summaries: summaries });
+
       } catch (err) {
         console.error(err);
-        chrome.runtime.sendMessage({ type: 'ERROR', message: err.toString() });
+        sendRuntimeMessage({ type: 'ERROR', message: err.toString() });
       }
     })();
     return true; // async

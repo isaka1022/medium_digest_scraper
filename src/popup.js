@@ -11,10 +11,25 @@ document.addEventListener('DOMContentLoaded', async () => {
   const progressFill = document.querySelector('.progress-fill');
   const resultsList = document.getElementById('results-list');
 
+  // Deprecated model IDs from previous versions mapped to their current replacements.
+  // Users who saved an old ID in storage will be silently upgraded on next open.
+  const MODEL_MIGRATIONS = {
+    'gpt-4o': 'gpt-4.1',
+    'gpt-4o-mini': 'gpt-4.1-mini',
+    'gemini-1.5-flash': 'gemini-2.0-flash',
+  };
+
   // Load settings
   const { apiKey, model } = await chrome.storage.local.get(['apiKey', 'model']);
   if (apiKey) apiKeyInput.value = apiKey;
-  if (model) modelSelect.value = model;
+  const resolvedModel = MODEL_MIGRATIONS[model] || model;
+  if (resolvedModel) {
+    modelSelect.value = resolvedModel;
+    // Persist the migrated ID so future reads use the new value.
+    if (resolvedModel !== model) {
+      chrome.storage.local.set({ model: resolvedModel });
+    }
+  }
 
   // Toggle Settings
   settingsBtn.addEventListener('click', () => {
