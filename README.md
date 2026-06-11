@@ -7,10 +7,10 @@ A Chrome extension that reads your Medium Daily Digest email, extracts article l
 ## Features
 
 - **One-click analysis** — Open a Medium Digest email and hit "Summarize Digest"
-- **AI summaries** — Generates concise bullet points via OpenAI GPT-4o / GPT-4o-mini (or compatible endpoints)
+- **AI summaries** — Generates concise bullet points via OpenAI GPT-4.1 / GPT-4.1 mini (or compatible endpoints)
 - **Background processing** — Fetches and parses articles without opening dozens of tabs (uses Chrome's Offscreen API)
 - **Incremental results** — Summaries stream into the popup as each article finishes
-- **Model selector** — Choose between GPT-4o, GPT-4o-mini, or Gemini 1.5 Flash (via OpenAI-compatible endpoint)
+- **Model selector** — Choose between GPT-4.1, GPT-4.1 mini, or Gemini 2.0 Flash (via OpenAI-compatible endpoint)
 - **Dark-mode UI** — Clean, readable interface built with vanilla JS
 
 ## How It Works
@@ -51,7 +51,7 @@ Chrome Web Store submission is not planned — load it manually in Developer Mod
 1. Click the extension icon in the toolbar.
 2. Click the gear icon (top-right of the popup).
 3. Enter your **OpenAI API Key** (starts with `sk-...`).
-4. Select a model (GPT-4o-mini is recommended for cost efficiency).
+4. Select a model (GPT-4.1 mini is recommended for cost efficiency).
 5. Click **Save Settings** — the key is stored locally via `chrome.storage.local` and never sent anywhere except the OpenAI API.
 
 ## Usage
@@ -65,7 +65,7 @@ Chrome Web Store submission is not planned — load it manually in Developer Mod
 
 - Google Chrome (Manifest V3 compatible — Chrome 116+)
 - An OpenAI API key ([platform.openai.com](https://platform.openai.com))
-  - GPT-4o-mini is recommended for low cost per digest
+  - GPT-4.1 mini is recommended for low cost per digest
   - Any OpenAI-compatible endpoint works (set the key accordingly)
 
 ## Project Structure
@@ -82,6 +82,23 @@ medium_digest_scraper/
     ├── popup.js         Popup logic: settings, progress, result rendering
     └── style.css        Dark-mode styles
 ```
+
+## Roadmap
+
+### Now
+- Replace `alert()` error dialogs with inline status messages in the popup UI
+- Detect paywall-truncated articles and display a badge on the result card
+- Integrate Readability.js for more accurate body text extraction (fewer nav/footer scraps)
+
+### Next
+- Chrome Built-in AI (Summarizer API) fallback — works without any API key
+- Ollama support via OpenAI-compatible endpoint setting
+- Markdown export of all summaries in one click
+
+### Later
+- RAG-style Q&A chat over the summarized articles
+- Local summary cache to avoid re-fetching articles across sessions
+- Chrome Web Store submission
 
 ## Limitations
 
